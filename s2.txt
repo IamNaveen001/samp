@@ -7,6 +7,7 @@ uname -a
 lsmod | grep kvm
 sudo apt update
 sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients
+sudo apt-cache search qemu-kvm
 systemctl status libvirtd
 virsh list
 virsh console
@@ -112,3 +113,4 @@ Flavor: Choose a size (e.g., m1.tiny)
 Network: Select a network (default: private)
 
 Click Launch Instance.
+
