@@ -1,0 +1,201 @@
+EX-2:VM-VM VM-HOST
+1.bridged adapter (vm-vm)
+2.ip a
+3.open another vm put that adres in that vm
+4.(vm-host)
+NAT adapter(network settings)
+open cmd and ping the ip of vm in host.
+
+
+exn :6 transfer of files from one vm to another vm
+
+1)SHARED FOLDER
+
+1. Create 2 vm's ->settings->shared folder ->path of folder want to share on both vm's
+2.On first vm
+//guest aditions
+sudo apt update
+sudo apt install virtualbox-guest-utils -y
+sudo mkdir /mnt/foldname
+sudo mount -t vboxsf vmshare /mnt/vmshare
+ls /mnt/vmshare
+
+check with another vm:
+vm1:
+cd /media/sf_foldername
+sudo usermod -aG vboxsf username
+cd /media/sf_foldername
+ls
+nano 'l.txt'
+write something
+vm2:
+acces those files created in vm1
+
+(or)
+
+
+1.Create two VMS (VM_1,VM_2)
+2.Create a shared folder on the Windows host (e.g., C:\\shared_vm_folder) and place a sample file (e.g., Sample.txt) inside it.
+3.For both vms(VM_1 & VM_2):
+	VM_1 → Settings → Shared Folders → Add new shared folder.
+	Folder Path: select C:\\shared_vm_folder.
+	Folder Name: shared_vm_folder.
+	Uncheck Read-only; check Auto-mount; optionally check Make Permanent.
+	Leave Mount point empty.
+
+	Start VM_1. 
+	sudo apt update
+	sudo apt install -y build-essential dkms linux-headers-$(uname -r)
+
+	With VM_1 running, VirtualBox menu → Devices → Insert Guest Additions CD Image…
+    	If prompted, click Run, or run manually:
+   	sudo /media/cdrom/VBoxLinuxAdditions.run
+        Reboot VM_1:   sudo reboot
+
+	Verify the auto-mounted shared folder inside each VM:
+   	ls /media/
+   	You should see:  sf_shared_vm_folder
+   	List its contents:
+   	ls /media/sf_shared_vm_folder
+
+File transfer between VMs:
+In VM_1:
+From VM_1:
+	Create a new file:
+	echo "File from VM_1" > /media/sf_shared_vm_folder/from_vm1.txt
+Check from VM_2:
+	Run: cat /media/sf_shared_vm_folder/from_vm1.txt
+
+
+
+
+
+
+
+
+
+2.FTP METHOD:(host-onlyadapter) (Root)
+sudo -s
+
+sudo apt update && sudo apt install vsftpd -y
+sudo nano /etc/vsftpd.conf
+
+
+listen=YES
+write_enable=YES
+pasv_enable=YES
+pasv_min_port=40000
+pasv_max_port=40100
+allow_writeable_chroot=YES
+
+
+uncomment
+chroot_local_user=YES
+listen_ipv6=NO//modify 
+
+sudo adduser ftpuser
+sudo mkdir /home/ftpuser/uploads
+sudo chown ftpuser:ftpuser /home/ftpuser/uploads
+///ftp through firewall
+sudo ufw allow 20/tcp
+sudo ufw allow 21/tcp
+sudo ufw allow 40000:40100/tcp
+sudo ufw enable
+
+
+sudo systemctl restart vsftpd
+sudo systemctl enable vsftpd
+sudo systemctl status vsftpd
+
+//test file
+su - ftpuser
+cd uploads
+echo "Hello from FTP server" > test.txt
+cat test.txt
+exit(after exiting,get the ip address of vm 1 ) ip a
+on VM2:
+ftp <VM1_IP_address>
+cd uploads
+get test.txt
+
+exit pannniru(bye)
+
+echo "Hello gurls" > client.txt
+ 
+
+
+ftp <VM1_IP_address>
+cd uploads
+put client.txt
+bye
+VM1:
+ls /home/ftpuser/uploads
+
+
+
+
+4.NFS(FILE SHARE)
+
+SERVER:
+sudo apt update
+sudo apt install nfs-kernel-server nfs-common -y
+client:
+sudo apt install nfs-common
+server:
+sudo mkdir -p /srv/nfs_share
+sudo chown nobody:nogroup /srv/nfs_share
+sudo chmod 777 /srv/nfs_share
+sudo nano /etc/exports
+
+type this:
+Add this line (allowing only the client to mount) 
+• rw: allow read/write 
+• sync: reply only after changes are written to disk 
+• no_subtree_check: improves performance for this simple export  
+/srv/nfs_share 192.168.100.5(rw,sync,no_subtree_check)
+
+sudo exportfs -a
+sudo systemctl restart nfs-kernel-server
+sudo exportfs -v
+
+sudo ufw allow from 192.168.100.5 to any port nfs
+
+
+CLIENT:
+sudo mkdir -p /mnt/nfs_client
+sudo mount <server_IP>:/srv/nfs_share /mnt/nfs_client
+DF -H
+
+cd /mnt/nfs_client
+touch testfile.txt
+
+server:
+cat /srv/nfs_share/testfile.txt
+
+
+
+5.ssh(both vms - NAT network)
+
+On both VMs(ubuntu & kali), open a terminal and run:
+
+sudo apt update
+sudo apt install openssh-server -y
+sudo systemctl enable ssh
+sudo systemctl start ssh
+sudo systemctl status ssh
+
+On VM1(ubuntu vm): hostname -I
+
+On VM2(kali vm): hostname -I or(ip a)
+ping both vms
+
+Go to server vm,(ubuntu vm)
+ls
+touch file.txt
+ls
+
+scp file.txt kali@ipadd of kali:/home/kali/
+check in client:(kali vm)
+ls
+
+Now file.txt will be in kali linux too...
