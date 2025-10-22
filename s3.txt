@@ -1,0 +1,104 @@
+10.Storage virtualization:
+
+sudo fdisk -l
+sudo pvdisplay (name override ->sudo vgremove vgname,sudo pvremove pvname)
+sudo lvdisplay
+sudo vgdisplay
+sudo pvcreate /dev/sdb
+sudo pvcreate -ff /dev/sdb
+sudo vgcreate my_vg /dev/sdb
+sudo lvcreate -L 5G -n my_vol my_vg
+sudo mkfs.ext4 /dev/my_vg/my_vol
+sudo mkdir /mnt/my_storage
+sudo mount /dev/my_vg/my_vol /mnt/my_storage
+df -h
+
+Storage virtualization
+
+apt install lvm2
+pvcreate /dev/sda
+vgcreate cloud-vg /dev/sda
+lvcreate -L 10G -n data cloud-vg
+
+mkfs.ext4 /dev/cloud-vg/data
+mkdir /mnt/gps
+mount /dev/cloud-vg/data /mnt/gps
+
+lvresize --size +1G cloud-vg/data
+
+
+9.Network virtualization
+
+method1: linux Brigde
+
+sudo apt install bridge-utils
+brctl addbr br-cloud
+brctl addif eth0 (or enp0s3)
+ifconfig eth0 0
+ifconfig br-cloud 10.0.0.15 netmask 255.255.255.0
+route add default gw 10.0.0.15 dev br-cloud
+route -n
+brctl show
+
+(or)
+
+sudo -s
+sudo apt update
+sudo apt install bridge-utils -y
+sudo ip link add name br0 type bridge
+ip a
+sudo ip addr add <ur ipaddress> dev br0
+sudo ip link set br0 up
+ip link
+sudo ip link set ens33 master br0
+brctl show
+
+OpenvSwitch 
+
+sudo apt install openvswitch-switch
+sudo systemctl enable openvswitch-switch
+sudo systemctl start openvswitch-switch
+sudo systemctl status openvswitch-switch
+sudo ovs-vsctl add-br ovs-br0
+sudo ovs-vsctl add-port ovs-br0 eth1
+sudo ovs-vsctl show
+
+
+8.HyperV:
+a)
+In windows(only clg systems)
+Press Windows + R, type optionalfeatures, and press Enter.
+In Windows Features, check these boxes:
+ Hyper-V
+ Hyper-V Management Tools
+ Hyper-V Platform
+click ok wait for install,restart ur pc
+c:/users/admin  --> systeminfo
+b) 
+go to start and search for "Hyper-V manager
+actions pane-> new ->virtual machine
+Choose:
+Specify Name(Vm1) and Location: Provide a name for the VM and choose where to store its files.
+Generation 1
+Assign RAM (e.g. 2048 MB)
+Select the created virtual switch for networking
+Attach an existing virtual hard disk (vhd)
+Finish setup (after summary)
+Go to powershell
+Using PowerShell:
+1.List VMs.
+Get-VM
+2.Start a VM.
+Start-VM -Name "Vm1"
+3.Stop a VM.
+Stop-VM -Name "Vm1" -Force # Use -Force to immediately shut down
+4.Restart a VM.
+Restart-VM -Name "Vm1"
+5.Create a Checkpoint (Snapshot).
+Checkpoint-VM -Name "Vm1" -SnapshotName "BeforeUpdate"
+6.Change VM Memory.
+Set-VMMemory -VMName "Vm1" -StartupBytes 4GB
+7.current VM alone
+Get-VM | Where-Object {$_.State -eq 'Running'}
+
+
