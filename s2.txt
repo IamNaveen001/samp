@@ -1,0 +1,114 @@
+6.KVM
+
+egrep -c '(vmx|svm)' /proc/cpuinfo
+if 0, egrep -c 'lm' /proc/cpuinfo
+uname -m 
+uname -a
+lsmod | grep kvm
+sudo apt update
+sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients
+systemctl status libvirtd
+virsh list
+virsh console
+virsh version
+virsh nodeinfo
+virt-manager
+
+vmm open
+right click qemu ->new
+import exising ->https://download.cirros-cloud.net/0.5.1/(disk img dwld pananum)
+path select and cirros ->forward....
+THEN LOGIN last
+
+exp:5b:(KVM CREATE IMAGES)
+
+1. VMM->QEMU -->LOCAL INSTALL MEDIA(https://releases.ubuntu.com/16.04/
+2.DWNLD THE SERVERI386.ISO
+3.USE ISO IAMGE
+4.2048 MB
+5.run the cmd:
+qemu-img create -f qcow2 ubuntu_vm.qcow2 10G
+
+6.select or create  custom storage (manage la click this qcow2)
+7.name it and click finish
+
+
+image resizing:
+sudo qemu-img resize ubuntu_vm.qcow2 +10G
+qemu-ig info ubuntu_vm.qcow2
+
+
+image conversion:
+qemu-img convert -0 vdi ubuntu_vm.qcow2 ubuntu_vm.vdi -p
+qemu-img convert -0 vpc ubuntu_vm.qcow2 ubuntu_vm.vdi -p
+
+
+(or)
+egrep -c '(vmx|svm)' /proc/cpuinfo
+if 0, egrep -c 'lm' /proc/cpuinfo
+uname -m 
+uname -a
+ls /lib/modules/5.4.0-84-generic/kernel/arch/x86/kvm/kvm*
+sudo apt update
+sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager qemu-system
+
+sudo apt install qemu-kvm libvirt-bin bridge-utils virt-manager qemu-system
+sudo nano /etc/libvirt/libvirtd.conf
+grep ^[^#] /etc/libvirt/libvirtd.conf
+sudo systemctl restart libvirtd
+virsh list
+virsh
+virsh # version
+virsh # nodeinfo
+vmm open
+right click qemu ->new
+import exising ->https://download.cirros-cloud.net/0.5.1/(disk img dwld pananum)
+path select and cirros ->forward....
+THEN LOGIN last
+
+
+
+
+
+
+
+
+7.OpenStack
+
+sudo apt update && sudo apt upgrade -y
+sudo adduser stack
+sudo su
+echo "stack ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/stack
+apt-get install git sudo
+
+su - stack
+git clone https://opendev.org/openstack/devstack
+cd devstack
+nano local.conf
+[[local|localrc]]
+ADMIN_PASSWORD=admin
+DATABASE_PASSWORD=admin
+RABBIT_PASSWORD=admin
+SERVICE_PASSWORD=admin
+
+
+./stack.sh
+
+http://<your-machine-ip>/dashboard
+Login to Horizon Dashboard.
+
+Go to Project → Compute → Instances.
+
+Click Launch Instance.
+
+Fill in details:
+
+Instance Name: myVM
+
+Source: Choose a boot image (e.g., cirros or ubuntu)
+
+Flavor: Choose a size (e.g., m1.tiny)
+
+Network: Select a network (default: private)
+
+Click Launch Instance.
