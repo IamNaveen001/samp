@@ -67,6 +67,11 @@ import exising ->https://download.cirros-cloud.net/0.5.1/(disk img dwld pananum)
 path select and cirros ->forward....
 THEN LOGIN last
 
+lock error:
+rm /var/lib/dpkg/lock-frontend
+rm /var/lib/dpkg/lock
+dpkg --configure -a
+
 
 
 
@@ -113,4 +118,5 @@ Flavor: Choose a size (e.g., m1.tiny)
 Network: Select a network (default: private)
 
 Click Launch Instance.
+
 
